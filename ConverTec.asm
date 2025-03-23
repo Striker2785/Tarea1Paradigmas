@@ -11,21 +11,21 @@ include \masm32\include\masm32rt.inc
     msgResultC db "Temperatura en Celsius: ", 0
     msgResultK db "Temperatura en Kelvin: ", 0
     msgContinue db "Ingrese 1 para continuar o 2 para salir: ", 0
-    inputBuffer db 10 dup(0)
-    resultBuffer db 10 dup(0)
-    CrLf db 13, 10, 0  ; Nueva línea y retorno de carro
-    five dword 5
-    nine dword 9
-    thirtyTwo dword 32
+    inputBuffer db 20 dup(0)
+    resultBuffer db 20 dup(0)
+    tempBuffer db 20 dup(0)
+    CrLf db 13, 10, 0  
+    five dword 500
+    nine dword 900
+    thirtyTwo dword 3200
+    scaleFactor dword 100
 
 .code
+FormatDecimal proto :DWORD, :DWORD
 start:
     mainLoop:
-        ; Mostrar menú
         invoke StdOut, addr msgMenu
         invoke StdIn, addr inputBuffer, sizeof inputBuffer
-
-        ; Convertir entrada a número
         invoke atodw, addr inputBuffer
         cmp eax, 1
         je convertFtoC
@@ -35,49 +35,33 @@ start:
         je convertKtoC
         cmp eax, 4
         je convertCtoK
-
-        ; Si la opción no es válida, salir
         invoke ExitProcess, 0
 
 convertFtoC:
-    ; Pedir temperatura en Fahrenheit
     invoke StdOut, addr msgFahrenheit
     invoke StdIn, addr inputBuffer, sizeof inputBuffer
     invoke atodw, addr inputBuffer
-    mov eax, eax  ; EAX contiene Fahrenheit
-
-    ; Fórmula: C = (F - 32) * 5 / 9
-    sub eax, 32   ; Fahrenheit - 32
-    imul eax, 5   ; Multiplicar por 5
-    cdq           ; Extender signo para división
-    idiv nine     ; Dividir por 9
-
-    ; Convertir resultado a string
-    invoke dwtoa, eax, addr resultBuffer
-
-    ; Mostrar resultado
+    imul eax, 100
+    sub eax, thirtyTwo   
+    imul eax, five   
+    cdq           
+    idiv nine     
+    invoke FormatDecimal, eax, addr resultBuffer
     invoke StdOut, addr msgResultC
     invoke StdOut, addr resultBuffer
     invoke StdOut, addr CrLf
     jmp continueLoop
 
 convertCtoF:
-    ; Pedir temperatura en Celsius
     invoke StdOut, addr msgCelsius
     invoke StdIn, addr inputBuffer, sizeof inputBuffer
     invoke atodw, addr inputBuffer
-    mov eax, eax  ; EAX contiene Celsius
-
-    ; Fórmula: F = (C * 9) / 5 + 32
-    imul eax, 9   ; Celsius * 9
-    cdq           ; Extender signo para división
-    idiv five     ; Dividir por 5
-    add eax, 32   ; Sumar 32
-
-    ; Convertir resultado a string
-    invoke dwtoa, eax, addr resultBuffer
-
-    ; Mostrar resultado
+    imul eax, 100
+    imul eax, nine   
+    cdq           
+    idiv five     
+    add eax, thirtyTwo   
+    invoke FormatDecimal, eax, addr resultBuffer
     invoke StdOut, addr msgResultF
     invoke StdOut, addr resultBuffer
     invoke StdOut, addr CrLf
@@ -87,11 +71,9 @@ convertKtoC:
     invoke StdOut, addr msgKelvin
     invoke StdIn, addr inputBuffer, sizeof inputBuffer
     invoke atodw, addr inputBuffer
-    mov eax, eax
-
-    sub eax, 273
-
-    invoke dwtoa, eax, addr resultBuffer
+    imul eax, 100
+    sub eax, 27300
+    invoke FormatDecimal, eax, addr resultBuffer
     invoke StdOut, addr msgResultC
     invoke StdOut, addr resultBuffer
     invoke StdOut, addr CrLf
@@ -101,11 +83,9 @@ convertCtoK:
     invoke StdOut, addr msgCelsius
     invoke StdIn, addr inputBuffer, sizeof inputBuffer
     invoke atodw, addr inputBuffer
-    mov eax, eax
-
-    add eax, 273
-
-    invoke dwtoa, eax, addr resultBuffer
+    imul eax, 100
+    add eax, 27300
+    invoke FormatDecimal, eax, addr resultBuffer
     invoke StdOut, addr msgResultK
     invoke StdOut, addr resultBuffer
     invoke StdOut, addr CrLf
@@ -124,5 +104,22 @@ continueLoop:
 exitProgram:
     invoke ExitProcess, 0
 
+; Subrutina para formatear un número con dos decimales
+FormatDecimal proc uses esi edi, value:DWORD, buffer:DWORD
+    mov esi, buffer
+    mov eax, value
+    cdq
+    idiv scaleFactor
+    push edx  ; Guardar los dos últimos dígitos
+    invoke dwtoa, eax, esi
+    invoke lstrlen, esi
+    mov ecx, eax
+    add esi, ecx
+    mov byte ptr [esi], '.'
+    inc esi
+    pop eax
+    invoke dwtoa, eax, esi
+    ret
+FormatDecimal endp
 
 end start
