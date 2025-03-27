@@ -42,8 +42,8 @@ includelib \masm32\lib\user32.lib
     msgPies db "Ingrese la longitud en Pies: " , 0
     msgYardas db "Ingrese la longitud en Yardas: ", 0
     msgMillas db "Ingrese la distancia en Millas: ", 0
-    msgCm     db "Ingrese la longitud en Centímetros: ", 0
-    msgKm     db "Ingrese la distancia en Kilómetros: ", 0
+    msgCm     db "Ingrese la longitud en Centimetros: ", 0
+    msgKm     db "Ingrese la distancia en Kilometros: ", 0
     msgOnzas db "Ingrese el peso en Onzas: ", 0
     msgLibras db "Ingrese el peso en Libras: ", 0
     msgToneladas db "Ingrese el peso en Toneladas: ", 0
@@ -51,8 +51,8 @@ includelib \masm32\lib\user32.lib
     msgResultF db "Temperatura en Fahrenheit: ", 0
     msgResultC db "Temperatura en Celsius: ", 0
     msgResultK db "Temperatura en Kelvin: ", 0
-    msgResultCM db "Longitud en Centímetros: ", 0
-    msgResultKM db "Distancia en Kilómetros: ", 0
+    msgResultCM db "Longitud en Centimetros: ", 0
+    msgResultKM db "Distancia en Kilometros: ", 0
     msgResultIN db "Longitud en Pulgadas: ", 0
     msgResultFT db "Longitud en Pies: ", 0
     msgResultYD db "Longitud en Yardas: ", 0
@@ -73,6 +73,8 @@ includelib \masm32\lib\user32.lib
     tempFahrenheit REAL8 ?
     pesoKilos REAL8 ?
     pesoLibras REAL8 ?
+    conInputBuffer REAL8 ?
+    conResultBuffer REAL8 ?
 .code
 main PROC
 Inicio:
@@ -85,16 +87,65 @@ Inicio:
    
     
     ; Verificar opción seleccionada usando el valor numérico
+    cmp eax, 1
+    je convertFtoC
     cmp eax, 2
-    je CtoF
+    je convertCtoF
+    cmp eax, 3
+    je convertKtoC
+    cmp eax, 4
+    je convertCtoK
+    cmp eax, 5
+    je convertPLGtoCM
+    cmp eax, 6
+    je convertFtToCm
+    cmp eax, 7
+    je convertYdToCm
+    cmp eax, 8
+    je convertMiToKm
+    cmp eax, 9
+    je convertCmToIn
+    cmp eax, 10
+    je convertCmToFt
+    cmp eax, 11
+    je convertCmToYd
+    cmp eax, 12
+    je convertKmToMi
+    cmp eax, 13
+    je convertOzToKg
+    cmp eax, 14
+    je convertLbToKg
+    cmp eax, 15
+    je convertTnToKg
+    cmp eax, 16
+    je convertKgToOz
     cmp eax, 17
-    je KGtoLB
-    
+    je convertKGtoLB
+    cmp eax, 18
+    je convertKgToTn
+         
     ; Si la opción no es válida
     invoke StdOut, addr msgOpcionInvalida
     jmp Inicio
 
-CtoF:
+convertFtoC:
+
+    invoke StdOut, addr msgFahrenheit
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr tempFahrenheit
+
+    fld tempFahrenheit
+    fsub real8 ptr [constanteTemp]
+    fmul real8 ptr [multiplicadorFar]
+    fstp tempCelsius
+
+    invoke FloatToStr, tempCelsius, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertCtoF:
     ; Mostrar mensaje de entrada para temperatura
     invoke StdOut, addr msgCelsius
     
@@ -121,7 +172,248 @@ CtoF:
     invoke StdOut, addr msgSaltoLinea
     jmp Continuar
 
-KGtoLB:
+
+convertKtoC:
+
+    invoke StdOut, addr msgKelvin
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fsub real8 ptr [constantK]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultK
+
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+
+convertCtoK:
+
+    invoke StdOut, addr msgCelsius
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fadd real8 ptr [constantK]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultC
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertPLGtoCM:
+
+    invoke StdOut, addr msgPulgadas
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [inToCmFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultCM
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertFtToCm:
+
+    invoke StdOut, addr msgPies
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [ftToCmFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultCM
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertYdToCm:
+
+    invoke StdOut, addr msgYardas
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [ydsToCmFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultCM
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertMiToKm:
+
+    invoke StdOut, addr msgMillas
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [miToKmFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultKM
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertCmToIn:
+
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [cmToInFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultIN
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertCmToFt:
+
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr buffer, 50
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [cmToFtFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, msgResultFT
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertCmToYd:
+
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [cmToYdFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, msgResultYD
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar   
+
+convertKmToMi:
+
+    invoke StdOut, addr msgKm
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [kmToMiFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, msgResultMI
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertOzToKg:
+
+    invoke StdOut, addr msgOnzas
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat ,addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [ozToKgFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultOZ
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertLbToKg:
+
+    invoke StdOut, addr msgLibras
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [lbToKgFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultKG
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertTnToKg:
+
+    invoke StdOut, addr msgToneladas
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [tnToKgFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultKG
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertKgToOz:
+
+    invoke StdOut, addr msgKilos
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [kgToOzFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, addr msgResultOZ
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar                    
+
+convertKGtoLB:
     ; Mostrar mensaje de entrada para peso
     invoke StdOut, addr msgKilos
     
@@ -145,6 +437,24 @@ KGtoLB:
     ; Mostrar resultado de peso
     invoke StdOut, addr bufferResultado
     invoke StdOut, addr msgSaltoLinea
+    jmp Continuar
+
+convertKgToTn:
+
+    invoke StdOut, addr msgKilos
+    invoke StdIn, addr buffer, 20
+    invoke StrToFloat, addr buffer, addr conInputBuffer
+
+    fld conInputBuffer
+    fmul real8 ptr [kgToTnFactor]
+    fstp conResultBuffer
+
+    invoke StdOut, msgResultTN
+    invoke FloatToStr, conResultBuffer, addr bufferResultado
+
+    invoke StdOut, addr bufferResultado
+    invoke StdOut, addr msgSaltoLinea
+    jmp Continuar    
     
 
 Continuar:
@@ -176,8 +486,28 @@ Salir:
 main ENDP
 
 .data
+    ; Factores de conversion temperatura
     multiplicadorTemp REAL8 1.8   ; 9/5
+    multiplicadorFar REAL8 0.55
+    constantK REAL8 273.15
     constanteTemp REAL8 32.0      ; Constante de conversión de temperatura
+
+    ; Factores de conversion peso
     multiplicadorKGLB REAL8 2.20462  ; Factor de conversión de Kilos a Libras
-    
+    ozToKgFactor REAL8 0.02835
+    lbToKgFactor REAL8 0.45359
+    tnToKgFactor REAL8 1000.00
+    kgToOzFactor REAL8 35.27
+    kgToTnFactor REAL8 0.001
+
+    ; Factores de conversion longitud
+    inToCmFactor REAL8 2.540
+    ftToCmFactor REAL8 30.48
+    ydsToCmFactor REAL8 91.44
+    miToKmFactor REAL8 1.60934
+    cmToInFactor REAL8 0.393701
+    cmToFtFactor REAL8 0.0328084
+    cmToYdFactor REAL8 0.0109361
+    kmToMiFactor REAL8 0.621371
+
 END main
