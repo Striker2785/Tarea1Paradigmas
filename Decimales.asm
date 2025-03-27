@@ -81,6 +81,30 @@ start:
         je convertInchesToCm
         cmp eax, 6
         je convertFeetToCm
+        cmp eax, 7
+        je convertYardsToCm
+        cmp eax, 8
+        je convertMilesToKm
+        cmp eax, 9
+        je convertCmToInches
+        cmp eax, 10
+        je convertCmToFeet
+        cmp eax, 11
+        je convertCmToYards
+        cmp eax, 12
+        je convertKmToMiles
+        cmp eax, 13
+        je convertOzToKg
+        cmp eax, 14
+        je convertLbToKg
+        cmp eax, 15
+        je convertTnToKg
+        cmp eax, 16
+        je convertKgToOz
+        cmp eax, 17
+        je convertKgToLb
+        cmp eax, 18
+        je convertKgToTn
         invoke ExitProcess, 0
 
 convertFtoC:
@@ -189,6 +213,233 @@ convertFeetToCm:
     
     invoke FormatDecimal, eax, addr resultBuffer
     invoke StdOut, addr msgResultCm
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertYardsToCm:
+    invoke StdOut, addr msgYardas
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de yardas a centímetros (1 yarda = 91.44 cm)
+    mov eax, tempBuffer
+    imul eax, 9144    ; Multiplicar por 91.44
+    mov ebx, 100      ; Dividir por 100 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultCm
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertMilesToKm:
+    invoke StdOut, addr msgMillas
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de millas a kilómetros (1 milla = 1.60934 km)
+    mov eax, tempBuffer
+    imul eax, 16093    ; Multiplicar por 1.60934 * 10000
+    mov ebx, 10000     ; Dividir por 10000 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultKM
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertCmToInches:
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de centímetros a pulgadas (1 cm = 0.393701 pulgadas)
+    mov eax, tempBuffer
+    imul eax, 39      ; Multiplicar por 0.39
+    mov ebx, 100      ; Dividir por 100 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultIN
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertCmToFeet:
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de centímetros a pies (1 pie = 30.48 cm)
+    mov eax, tempBuffer
+    mov ebx, 3048     ; Multiplicar por 30.48
+    imul eax, 100     ; Multiplicar por 100 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultFT
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertCmToYards:
+    invoke StdOut, addr msgCm
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de centímetros a yardas (1 yarda = 91.44 cm)
+    mov eax, tempBuffer
+    mov ebx, 9144     ; Multiplicar por 91.44
+    imul eax, 100     ; Ajustar para precisión decimal
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultYD
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertKmToMiles:
+    invoke StdOut, addr msgKm
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Kilómetros a Millas (1 km = 0.621371 millas)
+    mov eax, tempBuffer
+    imul eax, 62     ; Multiplicar por 0.62 (multiplicamos por 62 y dividimos por 100)
+    mov ebx, 100     ; Para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultMI
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertOzToKg:
+    invoke StdOut, addr msgOnzas
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Onzas a Kilos (1 onza = 0.0283495 kg)
+    mov eax, tempBuffer
+    imul eax, 2835    ; Multiplicar por 0.0283495 * 100000
+    mov ebx, 100000   ; Dividir para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultKG
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertLbToKg:
+    invoke StdOut, addr msgLibras
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Libras a Kilos (1 libra = 0.45359237 kg)
+    mov eax, tempBuffer
+    imul eax, 4536    ; Multiplicar por 0.45359237
+    mov ebx, 10000    ; Dividir por 10000 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultKG
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertTnToKg:
+    invoke StdOut, addr msgToneladas
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Toneladas a Kilos (1 Tonelada = 1000 Kilos)
+    mov eax, tempBuffer
+    imul eax, 100000  ; Multiplicar por 1000.00 para manejar dos decimales
+    mov ebx, 100      ; Dividir por 100 para ajustar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultKG
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertKgToOz:
+    invoke StdOut, addr msgKilos
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Kilos a Onzas (1 Kilo = 35.274 Onzas)
+    mov eax, tempBuffer
+    imul eax, 35274   ; Multiplicar por 35.274
+    mov ebx, 1000     ; Dividir por 1000 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultOZ
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertKgToLb:
+    invoke StdOut, addr msgKilos
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Kilos a Libras (1 kg = 2.20462 lbs)
+    mov eax, tempBuffer
+    imul eax, 22046   ; Multiplicar por 2.20462
+    mov ebx, 10000     ; Dividir por 10000 para manejar decimales
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultLB
+    invoke StdOut, addr resultBuffer
+    invoke StdOut, addr CrLf
+    jmp continueLoop
+
+convertKgToTn:
+    invoke StdOut, addr msgKilos
+    invoke StdIn, addr inputBuffer, sizeof inputBuffer
+    invoke ParseDecimal, addr inputBuffer, addr tempBuffer
+    jc invalidInput
+    
+    ; Conversión de Kilos a Toneladas (1 tonelada = 1000 kilos)
+    mov eax, tempBuffer
+    mov ebx, 1000     ; Dividir por 1000
+    cdq
+    idiv ebx
+    
+    invoke FormatDecimal, eax, addr resultBuffer
+    invoke StdOut, addr msgResultTN
     invoke StdOut, addr resultBuffer
     invoke StdOut, addr CrLf
     jmp continueLoop
