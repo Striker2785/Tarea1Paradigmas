@@ -61,7 +61,7 @@ includelib \masm32\lib\user32.lib
     msgResultOZ db "Peso en Onzas: ", 0
     msgResultLB db "Peso en Libras: ", 0
     msgResultTN db "Peso en Toneladas: ", 0
-    msgSaltoLinea db 13, 10, 0  ; Salto de línea
+    msgSaltoLinea db 13, 10, 0  ; Salto de lï¿½nea
     msgContinue db "Ingrese 1 para continuar o 2 para salir: ", 0
     msgSalida db "Gracias por usar el programa de conversion. Presione enter para cerrar", 13, 10, 0
     buffer db 20 dup(0)
@@ -86,7 +86,7 @@ Inicio:
     invoke atodw, addr inputBuffer
    
     
-    ; Verificar opción seleccionada usando el valor numérico
+    ; Verificar opciï¿½n seleccionada usando el valor numï¿½rico
     cmp eax, 1
     je convertFtoC
     cmp eax, 2
@@ -124,7 +124,7 @@ Inicio:
     cmp eax, 18
     je convertKgToTn
          
-    ; Si la opción no es válida
+    ; Si la opciï¿½n no es vï¿½lida
     invoke StdOut, addr msgOpcionInvalida
     jmp Inicio
 
@@ -152,10 +152,10 @@ convertCtoF:
     ; Leer entrada del usuario
     invoke StdIn, addr buffer, 20
     
-    ; Convertir cadena a número de punto flotante
+    ; Convertir cadena a nï¿½mero de punto flotante
     invoke StrToFloat, addr buffer, addr tempCelsius
     
-    ; Conversión de Celsius a Fahrenheit: (C * 9/5) + 32
+    ; Conversiï¿½n de Celsius a Fahrenheit: (C * 9/5) + 32
     fld tempCelsius        ; Cargar temperatura Celsius
     fmul real8 ptr [multiplicadorTemp]  ; Multiplicar por 9/5
     fadd real8 ptr [constanteTemp]      ; Sumar 32
@@ -304,7 +304,7 @@ convertCmToFt:
     fmul real8 ptr [cmToFtFactor]
     fstp conResultBuffer
 
-    invoke StdOut, msgResultFT
+    invoke StdOut, addr msgResultFT
     invoke FloatToStr, conResultBuffer, addr bufferResultado
 
     invoke StdOut, addr bufferResultado
@@ -321,7 +321,7 @@ convertCmToYd:
     fmul real8 ptr [cmToYdFactor]
     fstp conResultBuffer
 
-    invoke StdOut, msgResultYD
+    invoke StdOut, addr msgResultYD
     invoke FloatToStr, conResultBuffer, addr bufferResultado
 
     invoke StdOut, addr bufferResultado
@@ -338,7 +338,7 @@ convertKmToMi:
     fmul real8 ptr [kmToMiFactor]
     fstp conResultBuffer
 
-    invoke StdOut, msgResultMI
+    invoke StdOut, addr msgResultMI
     invoke FloatToStr, conResultBuffer, addr bufferResultado
 
     invoke StdOut, addr bufferResultado
@@ -414,27 +414,20 @@ convertKgToOz:
     jmp Continuar                    
 
 convertKGtoLB:
-    ; Mostrar mensaje de entrada para peso
     invoke StdOut, addr msgKilos
     
-    ; Leer entrada del usuario para peso
     invoke StdIn, addr buffer, 20
     
-    ; Convertir cadena a número de punto flotante
     invoke StrToFloat, addr buffer, addr pesoKilos
     
-    ; Conversión de Kilos a Libras: Kilos * 2.20462
     fld pesoKilos          ; Cargar peso en Kilos
-    fmul real8 ptr [multiplicadorKGLB]  ; Multiplicar por factor de conversión
+    fmul real8 ptr [multiplicadorKGLB]  ; Multiplicar por factor de conversiï¿½n
     fstp pesoLibras        ; Guardar resultado
     
-    ; Mostrar mensaje de salida para peso
     invoke StdOut, addr msgResultKG
     
-    ; Convertir resultado a cadena con formato
     invoke FloatToStr, pesoLibras, addr bufferResultado
     
-    ; Mostrar resultado de peso
     invoke StdOut, addr bufferResultado
     invoke StdOut, addr msgSaltoLinea
     jmp Continuar
@@ -449,7 +442,7 @@ convertKgToTn:
     fmul real8 ptr [kgToTnFactor]
     fstp conResultBuffer
 
-    invoke StdOut, msgResultTN
+    invoke StdOut, addr msgResultTN
     invoke FloatToStr, conResultBuffer, addr bufferResultado
 
     invoke StdOut, addr bufferResultado
@@ -461,12 +454,12 @@ Continuar:
     ; Preguntar si desea continuar
     invoke StdOut, addr msgContinue
     
-    ; Leer opción de continuación
+    ; Leer opciï¿½n de continuaciï¿½n
     invoke StdIn, addr buffer, 20
     mov al, byte ptr [buffer]
     mov [opcionContinuar], al
     
-    ; Verificar opción de continuación
+    ; Verificar opciï¿½n de continuaciï¿½n
     cmp [opcionContinuar], '1'
     je Inicio
     cmp [opcionContinuar], '2'
@@ -490,10 +483,10 @@ main ENDP
     multiplicadorTemp REAL8 1.8   ; 9/5
     multiplicadorFar REAL8 0.55
     constantK REAL8 273.15
-    constanteTemp REAL8 32.0      ; Constante de conversión de temperatura
+    constanteTemp REAL8 32.0      ; Constante de conversiï¿½n de temperatura
 
     ; Factores de conversion peso
-    multiplicadorKGLB REAL8 2.20462  ; Factor de conversión de Kilos a Libras
+    multiplicadorKGLB REAL8 2.20462  ; Factor de conversiï¿½n de Kilos a Libras
     ozToKgFactor REAL8 0.02835
     lbToKgFactor REAL8 0.45359
     tnToKgFactor REAL8 1000.00
